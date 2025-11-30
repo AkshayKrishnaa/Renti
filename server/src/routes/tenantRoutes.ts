@@ -2,7 +2,7 @@ import expresss from "express";
 import {
     getTenant,
     createTenant
-} from "../controllers/tenantControllers";
+} from "../controllers/tenantControllers.js";
 
 const router = expresss.Router();
 

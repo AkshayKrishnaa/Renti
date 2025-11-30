@@ -1,9 +1,9 @@
 import { type Request, type Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient(); 
 
-export const getTenant = async (req: Request, res: Response): Promise<void> => {
+export const getManager = async (req: Request, res: Response): Promise<void> => {
     try{
         const { cognitoId } = req.params;
         
@@ -12,26 +12,23 @@ export const getTenant = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const tenant = await prisma.tenant.findUnique({
+        const manager = await prisma.manager.findUnique({
             where: {cognitoId},
-            include: {
-                favorites: true
-            }
         });
 
-        if (tenant) {
-            res.json(tenant);
+        if (manager) {
+            res.json(manager);
         } else{
             res.status(404).json({ message: "Tenant not found"});
         }
     } catch (error: any){
         res
             .status(500)
-            .json({ message: `Error retrieving tenant: ${error.message}`});
+            .json({ message: `Error retrieving manager: ${error.message}`});
     }
 }
 
-export const createTenant = async (
+export const createManager = async (
     req: Request,
     res: Response
 ): Promise<void> =>{
@@ -43,14 +40,15 @@ export const createTenant = async (
             return;
         }
 
-        const tenant = await prisma.tenant.create({
+        const manager = await prisma.manager.create({
             data: {cognitoId, name, email, phoneNumber},
         });
 
-        res.status(201).json(tenant);
+        res.status(201).json(manager);
+        return;
     } catch (error: any){
         res
             .status(500)
-            .json({ message: `Error retrieving tenant: ${error.message}`});
+            .json({ message: `Error retrieving manager: ${error.message}`});
     }
 }

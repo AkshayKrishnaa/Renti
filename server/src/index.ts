@@ -8,7 +8,7 @@ import { authMiddleware } from "./middleware/authMiddleware.js";
 
 /* ROUTE IMPORT */
 import tenantRoutes from "./routes/tenantRoutes.js";
-
+import managerRoutes from "./routes/managerRoutes.js";
 /* CONFIGURATION */
 dotenv.config();
 const app = express();
@@ -26,6 +26,7 @@ app.get('/', (req, res) =>{
 });
 
 app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
+app.use("/managers", authMiddleware(["manager"]), managerRoutes);
 
 
 /* SERVER */

@@ -1,0 +1,1 @@
+{"version":3,"file":"managerControllers.d.ts","sourceRoot":"","sources":["../../../src/controllers/managerControllers.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,OAAO,EAAE,KAAK,QAAQ,EAAE,MAAM,SAAS,CAAC;AAKtD,eAAO,MAAM,UAAU,GAAU,KAAK,OAAO,EAAE,KAAK,QAAQ,KAAG,OAAO,CAAC,IAAI,CAuB1E,CAAA;AAED,eAAO,MAAM,aAAa,GACtB,KAAK,OAAO,EACZ,KAAK,QAAQ,KACd,OAAO,CAAC,IAAI,CAoBd,CAAA"}

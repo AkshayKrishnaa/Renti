@@ -1,0 +1,46 @@
+import {} from "express";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+export const getManager = async (req, res) => {
+    try {
+        const { cognitoId } = req.params;
+        if (!cognitoId) {
+            res.status(400).json({ message: "Cognito ID is required" });
+            return;
+        }
+        const manager = await prisma.manager.findUnique({
+            where: { cognitoId },
+        });
+        if (manager) {
+            res.json(manager);
+        }
+        else {
+            res.status(404).json({ message: "Tenant not found" });
+        }
+    }
+    catch (error) {
+        res
+            .status(500)
+            .json({ message: `Error retrieving manager: ${error.message}` });
+    }
+};
+export const createManager = async (req, res) => {
+    try {
+        const { cognitoId, name, email, phoneNumber } = req.body;
+        if (!cognitoId) {
+            res.status(400).json({ message: "Cognito ID is required" });
+            return;
+        }
+        const manager = await prisma.manager.create({
+            data: { cognitoId, name, email, phoneNumber },
+        });
+        res.status(201).json(manager);
+        return;
+    }
+    catch (error) {
+        res
+            .status(500)
+            .json({ message: `Error retrieving manager: ${error.message}` });
+    }
+};
+//# sourceMappingURL=managerControllers.js.map
