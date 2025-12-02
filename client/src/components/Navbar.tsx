@@ -1,10 +1,28 @@
+"use client";
+
 import { NAVBAR_HEIGHT } from '@/lib/constants'
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { Button } from './ui/button';
+import { useGetAuthUserQuery } from '@/state/api';
+import { usePathname, useRouter } from 'next/navigation';
+import { signOut } from 'aws-amplify/auth';
+import { Plus, Search } from 'lucide-react';
 
 const Navbar = () => {
+
+    const { data: authUser} = useGetAuthUserQuery();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const isDashboardPage = pathname.includes("/managers") || pathname.includes("/tenants");
+
+    const handleSignOut = async () => {
+        await signOut();
+        window.location.href = "/";
+    }
+
   return (
     <div
         className ="fixed top-0 left-0 w-full z-50 shadow-xl"
@@ -14,7 +32,7 @@ const Navbar = () => {
             <div className="flex items-center gap-4 md:gap-6">
                 <Link
                 href="/"
-                className="cursor-pointer hover:!text-primary-300"
+                className="cursor-pointer hover:!text-gray-300!"
                 scroll ={false}>
                     <div className = "flex items-center gap-3">
                         <Image
@@ -30,10 +48,37 @@ const Navbar = () => {
                         </div>
                     </div>
                 </Link>
+                {isDashboardPage && authUser && (
+                    <Button 
+                        variant="secondary"
+                        className= "md:ml-4 bg-gray-50 text-black hover:bg-amber-500 hover:text-gray-50"
+                        onClick={() =>
+                            router.push(
+                                authUser.userRole?.toLowerCase() === "manager"
+                                ? "managers/newproperty"
+                                : "/search"
+                            )
+                        }
+                        >
+                            {authUser.userRole?.toLowerCase() === "manager" ?(
+                                <>
+                                <Plus className= "h-4 w-4"/>
+                                <span className = "hidden md:block ml-2">Add New Property</span>
+                                </>
+                            ): (
+                                <>
+                                    <Search className= "h-4 w-4" />
+                                    <span className="hidden md:block ml-2">
+                                        Search Properties
+                                    </span>
+                                </>
+                            )}
+                        </Button>
+                )}
             </div>
-                <p className = "hidden md:block" style={{ color: '#e0e0e2' }}>
+               {!isDashboardPage && ( <p className = "hidden md:block" style={{ color: '#e0e0e2' }}>
                     Discover your perfect rental apartment with our advanced search
-                </p> 
+                </p> )}
                 <div className="flex items-center gap-5">
                     <Link href="/signin">
                     <Button variant="outline"

@@ -31,7 +31,7 @@ export const api = createApi({
           `/managers/${user.userId}`
           :`/tenants/${user.userId}`
 
-          let userDetailsResponse = await fetchWithBQ(endpoint);
+          let userDetailsResponse = await fetchWithBQ(endpoint); 
           //if user doesnt exist we are gonna create a new user
           if (userDetailsResponse.error && userDetailsResponse.error.status === 404){
             userDetailsResponse = await createNewUserInDatabase(
