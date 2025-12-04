@@ -60,7 +60,7 @@ const Navbar = () => {
                             )
                         }
                         >
-                            {authUser.userRole?.toLowerCase() === "" ?(
+                            {authUser.userRole?.toLowerCase() === "manager" ?(
                                 <>
                                 <Plus className= "h-4 w-4"/>
                                 <span className = "hidden md:block ml-2">Add New Property</span>
