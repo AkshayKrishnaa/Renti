@@ -8,11 +8,15 @@ import { Button } from './ui/button';
 import { useGetAuthUserQuery } from '@/state/api';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'aws-amplify/auth';
-import { Plus, Search } from 'lucide-react';
+import { Bell, MessageCircle, Plus, Search } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { SidebarTrigger } from './ui/sidebar';
+
 
 const Navbar = () => {
 
-    const { data: authUser} = useGetAuthUserQuery();
+    const { data: authUser, isLoading } = useGetAuthUserQuery();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -25,11 +29,16 @@ const Navbar = () => {
 
   return (
     <div
-        className ="fixed top-0 left-0 w-full z-50 shadow-xl"
-        style = {{height: `${NAVBAR_HEIGHT}px`}}
+        className ="fixed top-0 left-0 w-full z-50"
+        style = {{height: `${NAVBAR_HEIGHT}px`, boxShadow: '0 2px 4px rgba(0,0,0,0.1)'}}
     >
-        <div className="flex justify-between items-center w-full py-3 px-8 text-white" style={{ backgroundColor: '#27272a' }}>
+        <div className="flex justify-between items-center w-full py-3 px-8 text-white" style={{ backgroundColor: '#27272a', borderBottom: 'none' }}>
             <div className="flex items-center gap-4 md:gap-6">
+            {isDashboardPage && (
+                    <div className = "md:hidden">
+                        <SidebarTrigger />
+                    </div>
+                )}
                 <Link
                 href="/"
                 className="cursor-pointer hover:!text-gray-300!"
@@ -80,20 +89,79 @@ const Navbar = () => {
                     Discover your perfect rental apartment with our advanced search
                 </p> )}
                 <div className="flex items-center gap-5">
-                    <Link href="/signin">
-                    <Button variant="outline"
-                    className="text-white border-white bg-transparent hover:bg-white hover:text-black rounded-lg">
-                        Sign In
-                    </Button>
-                    </Link>
-                </div>
-                <div className="flex items-center gap-5">
-                    <Link href="/signup">
-                    <Button variant="outline"
-                    className="text-white border-orange-500 bg-transparent hover:bg-orange-500 hover:text-black rounded-lg">
-                        Sign Up
-                    </Button>
-                    </Link>
+                    {authUser ? (
+                        <>
+                            <div className="relative hidden md:block">
+                                <MessageCircle className="w-6 h-6 cursor-pointer text-white hover:text-gray-400" />
+                                <span className="absolute top-0 right-0 w-2 h-2 bg-red-700 rounded-full"></span>
+                            </div>
+                             <div className="relative hidden md:block">
+                                <Bell className="w-6 h-6 cursor-pointer text-white hover:text-gray-400" />
+                                <span className="absolute top-0 right-0 w-2 h-2 bg-red-700 rounded-full"></span>
+                            </div>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className = "flex items-center gap-2 focus:outline-none">
+                                <Avatar>
+                                    <AvatarImage src={authUser.userInfo?.image} />
+                                    <AvatarFallback className = "bg-gray-600">
+                                    {authUser.userInfo?.name?.[0]?.toUpperCase() || authUser.userRole?.[0]?.toUpperCase()}
+                                    </AvatarFallback>
+                                    
+                                </Avatar>
+                                  {!isLoading && (authUser?.userInfo?.name || authUser?.cognitoInfo?.username) && (
+                                    <p className = "text-gray-200 block whitespace-nowrap">
+                                        {authUser.userInfo?.name || authUser.cognitoInfo?.username}
+                                    </p>
+                                  )}
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className = "bg-white text-black">
+                                    <DropdownMenuItem className= 'cursor-pointer hover:!bg-black hover:!text-gray-100 font-bold'
+                                    onClick={()=> 
+                                        router.push(
+                                            authUser.userRole?.toLowerCase() === "manager"
+                                            ? "/managers/properties"
+                                            : "/tenants/favorites",
+                                            {scroll: false}
+                                        )
+                                    }>
+                                        Go to Dashboard
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className = "bg-gray-200" />
+                                    <DropdownMenuItem className= 'cursor-pointer hover:!bg-black hover:!text-gray-100 font-bold'
+                                    onClick={()=> 
+                                        router.push(
+                                            `/${authUser.userRole?.toLowerCase()}s/settings`,
+                                            {scroll: false}
+                                        )
+                                    }>
+                                        Settings
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem className= 'cursor-pointer hover:!bg-black hover:!text-gray-100 font-bold'
+                                    onClick={handleSignOut}
+                                    >
+                                        Sign Out
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/signin">
+                                <Button variant="outline"
+                                    className="text-white border-white bg-transparent hover:bg-white hover:text-black rounded-lg">
+                                    Sign In
+                                </Button>
+                            </Link>
+                            <Link href="/signup">
+                                <Button variant="outline"
+                                    className="text-white border-orange-500 bg-transparent hover:bg-orange-500 hover:text-black rounded-lg">
+                                    Sign Up
+                                </Button>
+                            </Link>
+                        </>
+                    )}
                 </div>
         </div>
     </div>
