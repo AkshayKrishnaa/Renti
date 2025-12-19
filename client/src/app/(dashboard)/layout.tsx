@@ -1,16 +1,49 @@
+"use client"
+
 import Navbar from '@/components/Navbar'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import Sidebar from "@/components/AppSidebar"
 import { NAVBAR_HEIGHT } from '@/lib/constants'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useGetAuthUserQuery } from '@/state/api'
+import { usePathname, useRouter } from 'next/navigation'
 
 const DashboardLayout = ({children}: {children: React.ReactNode}) => {
+    const {data: authUser,  isLoading: authloading} = useGetAuthUserQuery()
+    const router = useRouter();
+    const pathname = usePathname();
+    const [isLoading, setIsloading] = useState(true)
+
+    useEffect(() => {
+        if (authUser){
+            const userRole = authUser.userRole?.toLowerCase();
+            if (
+                (userRole === "manager" && pathname.startsWith("/tenants")) ||
+                (userRole === "tenant" && pathname.startsWith("/managers"))
+            ) {
+                router.push(
+                    userRole === "manager"
+                    ? "/managers/properties"
+                    : "/tenants/favorites",
+                    {scroll : false}
+                )
+        }else{
+            setIsloading(false)}
+        }
+    }, [authUser, router, pathname])
+
+    if(authloading || isLoading) return <>Loading...</>
+
+    if(!authUser?.userRole) return null;
+
+
   return (
 <SidebarProvider>
   <div>
     <Navbar />
     <div style = {{paddingTop: `${NAVBAR_HEIGHT}px`}}>
         <main className = "flex">
-            <Sidebar />
+            <Sidebar userType={authUser.userRole.toLowerCase() } />
             <div className="flex-grow transition-all duration-300">
                 {children}
             </div>
